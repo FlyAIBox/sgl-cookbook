@@ -1,50 +1,50 @@
 # DeepSeek-V3
 
-## 1. 模型介绍
+## 1. Model Introduction
 
-[DeepSeek V3](https://huggingface.co/deepseek-ai/DeepSeek-V3) 是由 DeepSeek 开发的大规模专家混合（MoE）语言模型，旨在以高训练和推理效率提供强大的通用推理、编码和工具增强能力。作为 DeepSeek 模型家族的最新一代，DeepSeek V3 引入了系统性的架构和训练创新，显著提升了推理、数学、编码和长上下文理解等方面的性能，同时保持了极具竞争力的计算成本。
+[DeepSeek V3](https://huggingface.co/deepseek-ai/DeepSeek-V3) is a large-scale Mixture-of-Experts (MoE) language model developed by DeepSeek, designed to deliver strong general-purpose reasoning, coding, and tool-augmented capabilities with high training and inference efficiency. As the latest generation in the DeepSeek model family, DeepSeek V3 introduces systematic architectural and training innovations that significantly improve performance across reasoning, mathematics, coding, and long-context understanding, while maintaining a competitive compute cost.
 
-核心亮点包括：
+Key highlights include:
 
-- **高效的 MoE 架构**：DeepSeek V3 采用细粒度的专家混合设计，拥有大量专家和稀疏激活，在保持推理和训练成本可控的同时实现高模型容量。
-- **先进的推理和编码能力**：该模型在数学推理、逻辑推理和真实世界编码基准测试中表现出色，受益于改进的数据筛选和训练策略。
-- **长上下文能力**：DeepSeek V3 支持扩展的上下文长度，使其能够更有效地处理长文档、复杂的多步推理和智能体式工作流。
-- **工具使用和函数调用**：该模型经过训练以支持结构化输出和工具调用，在推理过程中可与外部工具和智能体框架无缝集成。
+- **Efficient MoE architecture**: DeepSeek V3 adopts a fine-grained Mixture-of-Experts design with a large number of experts and sparse activation, enabling high model capacity while keeping inference and training costs manageable.
+- **Advanced reasoning and coding**: The model demonstrates strong performance on mathematical reasoning, logical inference, and real-world coding benchmarks, benefiting from improved data curation and training strategies.
+- **Long-context capability**: DeepSeek V3 supports extended context lengths, allowing it to handle long documents, complex multi-step reasoning, and agent-style workflows more effectively.
+- **Tool use and function calling**: The model is trained to support structured outputs and tool invocation, enabling seamless integration with external tools and agent frameworks during inference.
 
-## 2. SGLang 安装
+## 2. SGLang Installation
 
-SGLang 提供多种安装方法。您可以根据硬件平台和需求选择最合适的安装方法。
+SGLang offers multiple installation methods. You can choose the most suitable installation method based on your hardware platform and requirements.
 
-请参阅[官方 SGLang 安装指南](https://docs.sglang.ai/get_started/install.html)了解安装说明。
+Please refer to the [official SGLang installation guide](https://docs.sglang.ai/get_started/install.html) for installation instructions.
 
-## 3. 模型部署
+## 3. Model Deployment
 
-本节提供从快速部署到性能优化的渐进式指南，适合不同级别的用户。
+This section provides a progressive guide from quick deployment to performance optimization, suitable for users at different levels.
 
-### 3.1 基础配置
+### 3.1 Basic Configuration
 
-**交互式命令生成器**：使用下方的配置选择器，自动生成适合您硬件平台、模型变体、部署策略和推理能力的部署命令。
+**Interactive Command Generator**: Use the configuration selector below to automatically generate the appropriate deployment command for your hardware platform, model variant, deployment strategy, and thinking capabilities.
 
 import DeepSeekConfigGenerator from '@site/src/components/autoregressive/DeepSeekV3ConfigGenerator';
 
 <DeepSeekConfigGenerator />
 
-### 3.2 配置提示
-更多详细的配置建议，请参阅 [DeepSeek-V3 使用指南](https://docs.sglang.io/basic_usage/deepseek_v3.html)。
+### 3.2 Configuration Tips
+For more detailed configuration tips, please refer to [DeepSeek-V3 Usage](https://docs.sglang.io/basic_usage/deepseek_v3.html).
 
-## 4. 模型调用
+## 4. Model Invocation
 
-### 4.1 基础用法
+### 4.1 Basic Usage
 
-基础 API 使用方法和请求示例，请参阅：
+For basic API usage and request examples, please refer to:
 
-- [基础 API 使用](https://docs.sglang.ai/get_started/quick_start.html)
+- [Basic API Usage](https://docs.sglang.ai/get_started/quick_start.html)
 
-### 4.2 高级用法
+### 4.2 Advanced Usage
 
-#### 4.2.1 推理解析器
+#### 4.2.1 Reasoning Parser
 
-DeepSeek-V3 支持推理模式。在部署时启用推理解析器以分离思考和内容部分：
+DeepSeek-V3 supports reasoning mode. Enable the reasoning parser during deployment to separate the thinking and content sections:
 
 ```shell
 python -m sglang.launch_server \
@@ -53,7 +53,7 @@ python -m sglang.launch_server \
   --tp 8
 ```
 
-**带有思考过程的流式输出：**
+**Streaming with Thinking Process:**
 
 ```python
 from openai import OpenAI
@@ -63,11 +63,11 @@ client = OpenAI(
     api_key="EMPTY"
 )
 
-# 启用流式传输以实时查看思考过程
+# Enable streaming to see the thinking process in real-time
 response = client.chat.completions.create(
     model="deepseek-ai/DeepSeek-V3",
     messages=[
-        {"role": "user", "content": "逐步解决这个问题：240 的 15% 是多少？"}
+        {"role": "user", "content": "Solve this problem step by step: What is 15% of 240?"}
     ],
     temperature=0.7,
     max_tokens=2048,
@@ -75,7 +75,7 @@ response = client.chat.completions.create(
     stream=True
 )
 
-# 处理流
+# Process the stream
 has_thinking = False
 has_answer = False
 thinking_started = False
@@ -84,64 +84,64 @@ for chunk in response:
     if chunk.choices and len(chunk.choices) > 0:
         delta = chunk.choices[0].delta
 
-        # 打印思考过程
+        # Print thinking process
         if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
             if not thinking_started:
-                print("=============== 思考过程 =================", flush=True)
+                print("=============== Thinking =================", flush=True)
                 thinking_started = True
             has_thinking = True
             print(delta.reasoning_content, end="", flush=True)
 
-        # 打印答案内容
+        # Print answer content
         if delta.content:
-            # 关闭思考部分并添加内容标题
+            # Close thinking section and add content header
             if has_thinking and not has_answer:
-                print("\n=============== 答案内容 =================", flush=True)
+                print("\n=============== Content =================", flush=True)
                 has_answer = True
             print(delta.content, end="", flush=True)
 
 print()
 ```
 
-**输出示例：**
+**Output Example:**
 
 ```
-=============== 思考过程 =================
-要确定一个数的 15%，请按照以下步骤操作：
+=============== Thinking =================
+To determine 15% of a number, follow these steps:
 
-**步骤 1：理解问题**
-您需要找到给定数字的 15%。让我们假设这个数字是 240。
+**Step 1: Understand the Problem**
+You need to find 15% of a given number. Let's assume the number is 240 for this example.
 
-**步骤 2：将百分比转换为小数**
-要在计算中使用百分比，请将百分比转换为小数形式。为此，请将百分比除以 100。
+**Step 2: Convert the Percentage to a Decimal**
+To work with percentages in calculations, convert the percentage to its decimal form. To do this, divide the percentage by 100.
 
 \[ 15\% = \frac{15}{100} = 0.15 \]
 
-**步骤 3：将小数乘以数字**
-现在，将百分比的小数形式乘以您要找出百分比的数字。
+**Step 3: Multiply the Decimal by the Number**
+Now, multiply the decimal form of the percentage by the number you want to find the percentage of.
 
 \[ 0.15 \times 240 \]
 
-**步骤 4：执行乘法**
-计算乘积：
+**Step 4: Perform the Multiplication**
+Calculate the product:
 
 \[ 0.15 \times 240 = 36 \]
 
-**步骤 5：结论**
-因此，240 的 15% 为：
+**Step 5: Conclusion**
+Therefore, 15% of 240 is:
 
 \boxed{36}
 
-答案是 36。要找到 240 的 15%，我们将 240 乘以 0.15，结果等于 36。
+The answer is 36. To find 15% of 240, we multiply 240 by 0.15, which equals 36.
 ```
 
-**注意：**推理解析器会捕获模型的逐步思考过程，让您能够看到模型如何得出结论。
+**Note:** The reasoning parser captures the model's step-by-step thinking process, allowing you to see how the model arrives at its conclusions.
 
-#### 4.2.2 工具调用
+#### 4.2.2 Tool Calling
 
-DeepSeek-V3 支持工具调用功能。启用工具调用解析器：
+DeepSeek-V3 supports tool calling capabilities. Enable the tool call parser:
 
-**部署命令：**
+**Deployment Command:**
 
 ```shell
 python -m sglang.launch_server \
@@ -155,7 +155,7 @@ python -m sglang.launch_server \
 ```
 
 
-**Python 示例（带有思考过程）：**
+**Python Example (with Thinking Process):**
 
 ```python
 from openai import OpenAI
@@ -165,24 +165,24 @@ client = OpenAI(
     api_key="EMPTY"
 )
 
-# 定义可用工具
+# Define available tools
 tools = [
     {
         "type": "function",
         "function": {
             "name": "get_weather",
-            "description": "获取某个位置的当前天气",
+            "description": "Get the current weather for a location",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "location": {
                         "type": "string",
-                        "description": "城市名称"
+                        "description": "The city name"
                     },
                     "unit": {
                         "type": "string",
                         "enum": ["celsius", "fahrenheit"],
-                        "description": "温度单位"
+                        "description": "Temperature unit"
                     }
                 },
                 "required": ["location"]
@@ -191,11 +191,11 @@ tools = [
     }
 ]
 
-# 使用流式传输发出请求以查看思考过程
+# Make request with streaming to see thinking process
 response = client.chat.completions.create(
     model="deepseek-ai/DeepSeek-V3",
     messages=[
-        {"role": "user", "content": "北京的天气怎么样？"}
+        {"role": "user", "content": "What's the weather in Beijing?"}
     ],
     tools=tools,
     extra_body = {"chat_template_kwargs": {"thinking": True}},
@@ -203,7 +203,7 @@ response = client.chat.completions.create(
     stream=True
 )
 
-# 处理流式响应
+# Process streaming response
 thinking_started = False
 has_thinking = False
 tool_calls_accumulator = {}
@@ -212,19 +212,19 @@ for chunk in response:
     if chunk.choices and len(chunk.choices) > 0:
         delta = chunk.choices[0].delta
 
-        # 打印思考过程
+        # Print thinking process
         if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
             if not thinking_started:
-                print("=============== 思考过程 =================", flush=True)
+                print("=============== Thinking =================", flush=True)
                 thinking_started = True
             has_thinking = True
             print(delta.reasoning_content, end="", flush=True)
 
-        # 累积工具调用
+        # Accumulate tool calls
         if hasattr(delta, 'tool_calls') and delta.tool_calls:
-            # 必要时关闭思考部分
+            # Close thinking section if needed
             if has_thinking and thinking_started:
-                print("\n=============== 答案内容 =================\n", flush=True)
+                print("\n=============== Content =================\n", flush=True)
                 thinking_started = False
 
             for tool_call in delta.tool_calls:
@@ -241,47 +241,47 @@ for chunk in response:
                     if tool_call.function.arguments:
                         tool_calls_accumulator[index]['arguments'] += tool_call.function.arguments
 
-        # 打印内容
+        # Print content
         if delta.content:
             print(delta.content, end="", flush=True)
 
-# 打印累积的工具调用
+# Print accumulated tool calls
 for index, tool_call in sorted(tool_calls_accumulator.items()):
-    print(f"🔧 工具调用: {tool_call['name']}")
-    print(f"   参数: {tool_call['arguments']}")
+    print(f"🔧 Tool Call: {tool_call['name']}")
+    print(f"   Arguments: {tool_call['arguments']}")
 
 print()
 ```
 
-**输出示例：**
+**Output Example:**
 
 ```
-=============== 思考过程 =================
-<|tool▁calls▁begin|><|tool▁call▁begin|>function<|tool▁sep|>get_weather
+=============== Thinking =================
+<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>function<｜tool▁sep｜>get_weather
 ```json
 {"location": "Beijing", "unit": "celsius"}
-```<|tool▁call▁end|><|tool▁calls▁end|>
+```<｜tool▁call▁end｜><｜tool▁calls▁end｜>
 ```
 
-**注意：**
+**Note:**
 
-- 推理解析器显示模型如何决定使用工具
-- 工具调用清晰地标记了函数名称和参数
-- 然后您可以执行该函数并将结果发送回以继续对话
+- The reasoning parser shows how the model decides to use a tool
+- Tool calls are clearly marked with the function name and arguments
+- You can then execute the function and send the result back to continue the conversation
 
-**处理工具调用结果：**
+**Handling Tool Call Results:**
 
-请将以下代码块附加到之前的 Python 脚本。
+Please attach the code blocks below to the previous Python script.
 
 ```python
-# 获取工具调用后，执行函数
+# After getting the tool call, execute the function
 def get_weather(location, unit="celsius"):
-    # 您实际的天气 API 调用在此
-    return f"{location} 的天气是 22°{unit[0].upper()}，晴朗。"
+    # Your actual weather API call here
+    return f"The weather in {location} is 22°{unit[0].upper()} and sunny."
 
-# 将工具结果发送回模型
+# Send tool result back to the model
 messages = [
-    {"role": "user", "content": "北京的天气怎么样？"},
+    {"role": "user", "content": "What's the weather in Beijing?"},
     {
         "role": "assistant",
         "content": None,
@@ -308,25 +308,25 @@ final_response = client.chat.completions.create(
 )
 
 print(final_response.choices[0].message.content)
-# 输出："北京目前的天气是 22°C，晴朗。"
+# Output: "The weather in Beijing is currently 22°C and sunny."
 ```
 
-## 5. 性能基准测试
+## 5. Benchmark
 
-### 5.1 速度基准测试
+### 5.1 Speed Benchmark
 
-**测试环境：**
+**Test Environment:**
 
-- 硬件：AMD MI300X GPU (8x)
-- 模型：DeepSeek-V3
-- 张量并行度：8
-- sglang 版本：0.5.7
+- Hardware: AMD MI300X GPU (8x)
+- Model: DeepSeek-V3
+- Tensor Parallelism: 8
+- sglang version: 0.5.7
 
-我们使用 SGLang 内置的基准测试工具，在 [ShareGPT_Vicuna_unfiltered](https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered) 数据集上进行性能评估。该数据集包含真实对话数据，能够更好地反映实际使用场景中的性能表现。为了模拟真实世界的使用模式，我们将每个请求配置为 1024 个输入 token 和 1024 个输出 token，代表典型的中等长度对话和详细响应。
+We use SGLang's built-in benchmarking tool to conduct performance evaluation on the [ShareGPT_Vicuna_unfiltered](https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered) dataset. This dataset contains real conversation data and can better reflect performance in actual use scenarios. To simulate real-world usage patterns, we configure each request with 1024 input tokens and 1024 output tokens, representing typical medium-length conversations with detailed responses.
 
-#### 5.1.1 延迟敏感型基准测试
+#### 5.1.1 Latency-Sensitive Benchmark
 
-- 模型部署命令：
+- Model Deployment Command:
 
 ```shell
 python3 -m sglang.launch_server \
@@ -342,7 +342,7 @@ python3 -m sglang.launch_server \
   --port 8000
 ```
 
-- 基准测试命令：
+- Benchmark Command:
 
 ```shell
 python3 -m sglang.bench_serving \
@@ -356,7 +356,7 @@ python3 -m sglang.bench_serving \
   --max-concurrency 1
 ```
 
-- **测试结果：**
+- **Test Results:**
 
 ```
 ============ Serving Benchmark Result ============
@@ -398,9 +398,9 @@ Max ITL (ms):                            61.49
 ==================================================
 ```
 
-#### 5.1.2 吞吐量敏感型基准测试
+#### 5.1.2 Throughput-Sensitive Benchmark
 
-- 模型部署命令：
+- Model Deployment Command:
 
 ```shell
 python3 -m sglang.launch_server \
@@ -413,7 +413,7 @@ python3 -m sglang.launch_server \
   --port 8000
 ```
 
-- 基准测试命令：
+- Benchmark Command:
 
 ```shell
 python3 -m sglang.bench_serving \
@@ -427,7 +427,7 @@ python3 -m sglang.bench_serving \
   --max-concurrency 100
 ```
 
-- **测试结果：**
+- **Test Results:**
 
 ```
 ============ Serving Benchmark Result ============
@@ -468,17 +468,17 @@ Max ITL (ms):                            43465.60
 ==================================================
 ```
 
-### 5.2 准确性基准测试
+### 5.2 Accuracy Benchmark
 
-#### 5.2.1 GSM8K 基准测试
+#### 5.2.1 GSM8K Benchmark
 
-- **基准测试命令：**
+- **Benchmark Command:**
 
 ```shell
 python3 -m sglang.test.few_shot_gsm8k --num-questions 200 --port 8000
 ```
 
-- **测试结果**：
+- **Test Results**:
   - DeepSeek-V3
     ```
     Accuracy: 0.960
@@ -487,9 +487,9 @@ python3 -m sglang.test.few_shot_gsm8k --num-questions 200 --port 8000
     Output throughput: 614.211 token/s
     ```
 
-#### 5.2.2 MMLU 基准测试
+#### 5.2.2 MMLU Benchmark
 
-- **基准测试命令：**
+- **Benchmark Command:**
 
 ```shell
 cd sglang
@@ -497,7 +497,7 @@ bash benchmark/mmlu/download_data.sh
 python3 benchmark/mmlu/bench_sglang.py --nsub 10 --port 8000
 ```
 
-- **测试结果**：
+- **Test Results**:
   - DeepSeek-V3
     ```
     subject: abstract_algebra, #q:100, acc: 0.800

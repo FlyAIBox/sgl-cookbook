@@ -4,69 +4,69 @@ sidebar_position: 1
 
 # DeepSeek-OCR
 
-## 1. 模型介绍
+## 1. Model Introduction
 
-[DeepSeek-OCR](https://github.com/deepseek-ai/DeepSeek-OCR) 是 DeepSeek 推出的先进 OCR（光学字符识别）模型，专为从图像中高精度提取文本而设计。该模型针对各种文档处理和图像转文本任务进行了优化。
+[DeepSeek-OCR](https://github.com/deepseek-ai/DeepSeek-OCR) is DeepSeek's advanced OCR (Optical Character Recognition) model designed for high-accuracy text extraction from images. The model is optimized for various document processing and image-to-text conversion tasks.
 
-**核心特性：**
+**Key Features:**
 
-- **先进的 OCR 能力**：从图像和文档中进行高精度文本识别
-- **多模态支持**：支持各种图像格式和文档类型
+- **Advanced OCR**: High-accuracy text recognition from images and documents
+- **Multi-Modality**: Supports various image formats and document types
 
-**可用模型：**
+**Available Models:**
 
-- **基础模型**：[deepseek-ai/DeepSeek-OCR](https://huggingface.co/deepseek-ai/DeepSeek-OCR) - 推荐用于 OCR 任务
+- **Base Model**: [deepseek-ai/DeepSeek-OCR](https://huggingface.co/deepseek-ai/DeepSeek-OCR) - Recommended for OCR tasks
 
-**许可证：**
-使用 DeepSeek-OCR 需同意 DeepSeek 社区许可证。详情请参阅 [LICENSE](https://huggingface.co/deepseek-ai/DeepSeek-OCR/blob/main/LICENSE)。
+**License:**
+To use DeepSeek-OCR, you must agree to DeepSeek's Community License. See [LICENSE](https://huggingface.co/deepseek-ai/DeepSeek-OCR/blob/main/LICENSE) for details.
 
-更多详情，请参阅[官方 DeepSeek-OCR 仓库](https://github.com/deepseek-ai/DeepSeek-OCR)。
+For more details, please refer to the [official DeepSeek-OCR repository](https://github.com/deepseek-ai/DeepSeek-OCR).
 
-## 2. SGLang 安装
+## 2. SGLang Installation
 
-请参阅[官方 SGLang 安装指南](https://docs.sglang.ai/get_started/install.html)了解安装说明。
+Please refer to the [official SGLang installation guide](https://docs.sglang.ai/get_started/install.html) for installation instructions.
 
-## 3. 模型部署
+## 3. Model Deployment
 
-本节提供针对不同硬件平台和使用场景优化的部署配置。
+This section provides deployment configurations optimized for different hardware platforms and use cases.
 
-### 3.1 基础配置
+### 3.1 Basic Configuration
 
-**交互式命令生成器**：使用下方的配置选择器，自动生成适合您硬件平台、量化方法和部署策略的部署命令。
+**Interactive Command Generator**: Use the configuration selector below to automatically generate the appropriate deployment command for your hardware platform, quantization method, and deployment strategy.
 
 import DeepSeekOCRConfigGenerator from '@site/src/components/autoregressive/DeepSeekOCRConfigGenerator';
 
 <DeepSeekOCRConfigGenerator />
 
-### 3.2 配置提示
+### 3.2 Configuration Tips
 
-更多详细的配置建议，请参阅 [DeepSeek V3/V3.1/R1 使用指南](https://docs.sglang.io/basic_usage/deepseek_v3.html)。
+For more detailed configuration tips, please refer to [DeepSeek V3/V3.1/R1 Usage](https://docs.sglang.io/basic_usage/deepseek_v3.html).
 
-## 4. 模型调用
+## 4. Model Invocation
 
-### 4.1 基础用法
+### 4.1 Basic Usage
 
-基础 API 使用方法和请求示例，请参阅：
+For basic API usage and request examples, please refer to:
 
-- [SGLang 基础使用指南](https://docs.sglang.ai/basic_usage/send_request.html)
+- [SGLang Basic Usage Guide](https://docs.sglang.ai/basic_usage/send_request.html)
 
 
-## 5. 性能基准测试
+## 5. Benchmark
 
-### 5.1 速度基准测试
+### 5.1 Speed Benchmark
 
-**测试环境：**
+**Test Environment:**
 
-- 硬件：AMD MI300X GPU (1x)
-- 模型：DeepSeek-OCR
-- 张量并行度：1
-- sglang 版本：0.5.7
+- Hardware: AMD MI300X GPU (1x)
+- Model: DeepSeek-OCR
+- Tensor Parallelism: 1
+- sglang version: 0.5.7
 
-我们使用 SGLang 内置的基准测试工具，在 [ShareGPT_Vicuna_unfiltered](https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered) 数据集上进行性能评估。该数据集包含真实对话数据，能够更好地反映实际使用场景中的性能表现。为了模拟真实世界的使用模式，我们将每个请求配置为 1024 个输入 token 和 1024 个输出 token，代表典型的中等长度对话和详细响应。
+We use SGLang's built-in benchmarking tool to conduct performance evaluation on the [ShareGPT_Vicuna_unfiltered](https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered) dataset. This dataset contains real conversation data and can better reflect performance in actual use scenarios. To simulate real-world usage patterns, we configure each request with 1024 input tokens and 1024 output tokens, representing typical medium-length conversations with detailed responses.
 
-#### 5.1.1 延迟敏感型基准测试
+#### 5.1.1 Latency-Sensitive Benchmark
 
-- 模型部署命令：
+- Model Deployment Command:
 
 ```shell
 python3 -m sglang.launch_server \
@@ -77,7 +77,7 @@ python3 -m sglang.launch_server \
   --port 8000
 ```
 
-- 基准测试命令：
+- Benchmark Command:
 
 ```shell
 python3 -m sglang.bench_serving \
@@ -91,7 +91,7 @@ python3 -m sglang.bench_serving \
   --max-concurrency 1
 ```
 
-- **测试结果：**
+- **Test Results:**
 
 ```
 ============ Serving Benchmark Result ============
@@ -132,9 +132,9 @@ Max ITL (ms):                            8.28
 ==================================================
 ```
 
-#### 5.1.2 吞吐量敏感型基准测试
+#### 5.1.2 Throughput-Sensitive Benchmark
 
-- 模型部署命令：
+- Model Deployment Command:
 
 ```shell
 python3 -m sglang.launch_server \
@@ -148,7 +148,7 @@ python3 -m sglang.launch_server \
   --port 8000
 ```
 
-- 基准测试命令：
+- Benchmark Command:
 
 ```shell
 python3 -m sglang.bench_serving \
@@ -162,7 +162,7 @@ python3 -m sglang.bench_serving \
   --max-concurrency 100
 ```
 
-- **测试结果：**
+- **Test Results:**
 
 ```
 ============ Serving Benchmark Result ============
