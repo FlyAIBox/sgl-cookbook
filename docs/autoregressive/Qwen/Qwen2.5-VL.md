@@ -4,62 +4,62 @@ sidebar_position: 5
 
 # Qwen2.5-VL
 
-## 1. Model Introduction
+## 1. 模型介绍
 
-**[Qwen2.5-VL](https://huggingface.co/collections/Qwen/qwen25-vl)** is a vision-language model series from the Qwen team, offering significant improvements over its predecessor in understanding, reasoning, and multi-modal processing.
+**[Qwen2.5-VL](https://huggingface.co/collections/Qwen/qwen25-vl)** 是 Qwen 团队推出的视觉语言模型系列，在理解、推理和多模态处理方面相比前代版本有显著改进。
 
-**Key Features:**
+**核心特性：**
 
-- **Understand things visually**: Proficient in recognizing common objects such as flowers, birds, fish, and insects, and it is highly capable of analyzing texts, charts, icons, graphics, and layouts within images.
-- **More Agentic**: Play as a visual agent that can reason and dynamically direct tools, which is capable of computer use and phone use.
-- **Understanding long videos and capturing events**: Supports comprehending videos of over 1 hour, and this time it has a new ability of cpaturing event by pinpointing the relevant video segments.
-- **Capable of visual localization in different formats**: Accurately localize objects in an image by generating bounding boxes or points, and it can provide stable JSON outputs for coordinates and attributes.
-- **Generating structured outputs**: Supports structured outputs of the contents, benefiting usages in finance, commerce, etc for data like scans of invoices, forms, tables, etc.
-- **Dynamic Resolution and Frame Rate Training for Video Understanding**: Extend dynamic resolution to the temporal dimension by adopting dynamic FPS sampling, enabling the model to comprehend videos at various sampling rates. Accordingly, we update mRoPE in the time dimension with IDs and absolute time alignment, enabling the model to learn temporal sequence and speed, and ultimately acquire the ability to pinpoint specific moments.
-- **Multiple Sizes**: Available in 3B, 7B, 32B, and 72B variants to suit different deployment needs.
-- **ROCm Support**: Compatible with AMD MI300X, MI325X and MI355X GPUs via SGLang (verified).
+- **视觉理解能力**：精通识别花卉、鸟类、鱼类和昆虫等常见物体，并能高效分析图像中的文本、图表、图标、图形和布局。
+- **更强的智能体能力**：可作为视觉智能体进行推理并动态指导工具，支持计算机和手机的使用。
+- **长视频理解和事件捕获**：支持理解超过 1 小时的视频，并具备通过定位相关视频片段来捕获事件的新能力。
+- **多格式视觉定位**：通过生成边界框或点来精确定位图像中的对象，并可为坐标和属性提供稳定的 JSON 输出。
+- **生成结构化输出**：支持内容的结构化输出，有利于金融、商业等领域对发票扫描、表单、表格等数据的使用。
+- **视频理解的动态分辨率和帧率训练**：通过采用动态 FPS 采样将动态分辨率扩展到时间维度，使模型能够以各种采样率理解视频。相应地，我们使用 ID 和绝对时间对齐在时间维度上更新 mRoPE，使模型能够学习时间序列和速度，并最终获得定位特定时刻的能力。
+- **多种尺寸**：提供 3B、7B、32B 和 72B 变体，以满足不同的部署需求。
+- **ROCm 支持**：通过 SGLang 兼容 AMD MI300X、MI325X 和 MI355X GPU（已验证）。
 
-For more details, please refer to the [official Qwen2.5-VL GitHub Repository](https://github.com/QwenLM/Qwen3-VL).
+更多详情，请参阅[官方 Qwen2.5-VL GitHub 仓库](https://github.com/QwenLM/Qwen3-VL)。
 
-## 2. SGLang Installation
+## 2. SGLang 安装
 
-SGLang offers multiple installation methods. You can choose the most suitable installation method based on your hardware platform and requirements.
+SGLang 提供多种安装方法。您可以根据硬件平台和需求选择最合适的安装方法。
 
-Please refer to the [official SGLang installation guide](https://docs.sglang.ai/get_started/install.html) for installation instructions.
+请参阅[官方 SGLang 安装指南](https://docs.sglang.ai/get_started/install.html)了解安装说明。
 
-## 3. Model Deployment
+## 3. 模型部署
 
-This section provides deployment configurations optimized for AMD MI300X, MI325X and MI355X hardware platforms and different use cases.
+本节提供针对 AMD MI300X、MI325X 和 MI355X 硬件平台和不同使用场景优化的部署配置。
 
-### 3.1 Basic Configuration
+### 3.1 基础配置
 
-The Qwen2.5-VL series offers models in various sizes. The following configurations have been verified on AMD MI300X, MI325X and MI355X GPUs.
+Qwen2.5-VL 系列提供各种尺寸的模型。以下配置已在 AMD MI300X、MI325X 和 MI355X GPU 上验证。
 
-**Interactive Command Generator**: Use the configuration selector below to automatically generate the appropriate deployment command for your hardware platform and model size.
+**交互式命令生成器**：使用下方的配置选择器，自动生成适合您硬件平台和模型尺寸的部署命令。
 
 import Qwen25VLConfigGenerator from '@site/src/components/autoregressive/Qwen25VLConfigGenerator';
 
 <Qwen25VLConfigGenerator />
 
-### 3.2 Configuration Tips
+### 3.2 配置提示
 
-* **Memory Management**: For the 72B model on MI300X/MI325X/MI355X, we have verified successful deployment with `--context-length 128000`. Smaller context lengths can be used to reduce memory usage if needed.
-* **Multi-GPU Deployment**: Use Tensor Parallelism (`--tp`) to scale across multiple GPUs. For example, use `--tp 8` for the 72B model and `--tp 2` for the 32B model on MI300X/MI325X/MI355X.
+* **内存管理**：对于 MI300X/MI325X/MI355X 上的 72B 模型，我们已验证使用 `--context-length 128000` 成功部署。如果需要，可以使用较小的上下文长度来减少内存使用。
+* **多 GPU 部署**：使用张量并行（`--tp`）跨多个 GPU 扩展。例如，对于 MI300X/MI325X/MI355X 上的 72B 模型使用 `--tp 8`，对于 32B 模型使用 `--tp 2`。
 
-## 4. Model Invocation
+## 4. 模型调用
 
-### 4.1 Basic Usage
+### 4.1 基础用法
 
-For basic API usage and request examples, please refer to:
+基础 API 使用方法和请求示例，请参阅：
 
-- [SGLang Basic Usage Guide](https://docs.sglang.ai/basic_usage/send_request.html)
-- [SGLang OpenAI Vision API Guide](https://docs.sglang.ai/basic_usage/openai_api_vision.html)
+- [SGLang 基础使用指南](https://docs.sglang.ai/basic_usage/send_request.html)
+- [SGLang OpenAI Vision API 指南](https://docs.sglang.ai/basic_usage/openai_api_vision.html)
 
-### 4.2 Advanced Usage
+### 4.2 高级用法
 
-#### 4.2.1 Multi-Modal Inputs
+#### 4.2.1 多模态输入
 
-Qwen2.5-VL supports image inputs. Here's a basic example with single image input:
+Qwen2.5-VL 支持图像输入。以下是单图像输入的基本示例：
 
 ```python
 import time
@@ -83,7 +83,7 @@ messages = [
             },
             {
                 "type": "text",
-                "text": "Read all the text in the image."
+                "text": "读取图像中的所有文本。"
             }
         ]
     }
@@ -95,15 +95,15 @@ response = client.chat.completions.create(
     messages=messages,
     max_tokens=2048
 )
-print(f"Response costs: {time.time() - start:.2f}s")
-print(f"Generated text: {response.choices[0].message.content}")
+print(f"响应耗时: {time.time() - start:.2f}s")
+print(f"生成的文本: {response.choices[0].message.content}")
 ```
 
-**Example Output:**
+**示例输出：**
 
 ```text
-Response costs: 2.31s
-Generated text: Auntie Anne's
+响应耗时: 2.31s
+生成的文本: Auntie Anne's
 
 CINNAMON SUGAR
 1 x 17,000
@@ -120,9 +120,9 @@ CHANGE DUE
 3,000
 ```
 
-**Multi-Image Input Example:**
+**多图像输入示例：**
 
-Qwen2.5-VL can process multiple images in a single request for comparison or analysis:
+Qwen2.5-VL 可以在单个请求中处理多个图像以进行比较或分析：
 
 ```python
 import time
@@ -152,7 +152,7 @@ messages = [
             },
             {
                 "type": "text",
-                "text": "Compare these two images and describe the differences in 100 words or less."
+                "text": "比较这两张图像并用 100 字或更少的文字描述差异。"
             }
         ]
     }
@@ -164,39 +164,32 @@ response = client.chat.completions.create(
     messages=messages,
     max_tokens=2048
 )
-print(f"Response costs: {time.time() - start:.2f}s")
-print(f"Generated text: {response.choices[0].message.content}")
+print(f"响应耗时: {time.time() - start:.2f}s")
+print(f"生成的文本: {response.choices[0].message.content}")
 ```
 
-**Example Output:**
+**注意：**
 
-```text
-Response costs: 13.79s
-Generated text: The first image shows a single red taxi driving on a street with a few other taxis in the background. The second image shows a large number of taxis parked in a lot, with some appearing to be in various states of repair. The first image has a single taxi with a visible license plate, while the second image has multiple taxis with different license plates. The first image has a clear view of the street and surrounding area, while the second image is taken from an elevated perspective, showing a wider view of the parking lot and the surrounding area.
-```
-
-**Note:**
-
-- You can also provide local file paths using `file://` protocol.
-- For larger images, you may need more memory, adjust `--mem-fraction-static` accordingly.
+- 您也可以使用 `file://` 协议提供本地文件路径。
+- 对于较大的图像，您可能需要更多内存，请相应调整 `--mem-fraction-static`。
 
 
-## 5. Benchmark
+## 5. 性能基准测试
 
-### 5.1 Speed Benchmark
+### 5.1 速度基准测试
 
-**Test Environment:**
+**测试环境：**
 
-- Hardware: AMD MI300X GPU (8x)
-- Model: Qwen2.5-VL-72B-Instruct
-- Tensor Parallelism: 8
-- SGLang Version: 0.5.6
+- 硬件：AMD MI300X GPU (8x)
+- 模型：Qwen2.5-VL-72B-Instruct
+- 张量并行度：8
+- SGLang 版本：0.5.6
 
-We use SGLang's built-in benchmarking tool to conduct performance evaluation with random images. To simulate real-world usage, you can specify different input and output lengths for each request. For example, each request can have 128 input tokens, two 720p images, and 1024 output tokens.
+我们使用 SGLang 内置的基准测试工具，使用随机图像进行性能评估。为了模拟真实世界的使用情况，您可以为每个请求指定不同的输入和输出长度。例如，每个请求可以有 128 个输入 token、两张 720p 图像和 1024 个输出 token。
 
-#### 5.1.1 Latency-Sensitive Benchmark
+#### 5.1.1 延迟敏感型基准测试
 
-- Model Deployment Command:
+- 模型部署命令：
 
 ```shell
 python -m sglang.launch_server \
@@ -206,7 +199,7 @@ python -m sglang.launch_server \
   --port 30000
 ```
 
-- Benchmark Command:
+- 基准测试命令：
 
 ```shell
 python3 -m sglang.bench_serving \
@@ -223,9 +216,9 @@ python3 -m sglang.bench_serving \
   --max-concurrency 1
 ```
 
-#### 5.1.2 Throughput-Sensitive Benchmark
+#### 5.1.2 吞吐量敏感型基准测试
 
-- Model Deployment Command:
+- 模型部署命令：
 
 ```shell
 python -m sglang.launch_server \
@@ -234,49 +227,8 @@ python -m sglang.launch_server \
   --host 0.0.0.0 \
   --port 30000
 ```
-- Result:
-```text
-============ Serving Benchmark Result ============
-Backend:                                 sglang-oai-chat
-Traffic request rate:                    inf
-Max request concurrency:                 1
-Successful requests:                     10
-Benchmark duration (s):                  37.99
-Total input tokens:                      24781
-Total input text tokens:                 821
-Total input vision tokens:               23960
-Total generated tokens:                  4220
-Total generated tokens (retokenized):    2365
-Request throughput (req/s):              0.26
-Input token throughput (tok/s):          652.26
-Output token throughput (tok/s):         111.07
-Peak output token throughput (tok/s):    128.00
-Peak concurrent requests:                2
-Total token throughput (tok/s):          763.34
-Concurrency:                             1.00
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   3797.61
-Median E2E Latency (ms):                 3140.90
-P90 E2E Latency (ms):                    6545.54
-P99 E2E Latency (ms):                    7939.56
----------------Time to First Token----------------
-Mean TTFT (ms):                          504.45
-Median TTFT (ms):                        510.93
-P99 TTFT (ms):                           521.78
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          7.82
-Median TPOT (ms):                        7.82
-P99 TPOT (ms):                           7.84
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           10.07
-Median ITL (ms):                         7.90
-P95 ITL (ms):                            15.79
-P99 ITL (ms):                            15.93
-Max ITL (ms):                            23.60
-==================================================
-```
 
-- Benchmark Command:
+- 基准测试命令：
 
 ```shell
 python3 -m sglang.bench_serving \
@@ -292,102 +244,17 @@ python3 -m sglang.bench_serving \
   --num-prompts 1000 \
   --max-concurrency 100
 ```
-```text
-============ Serving Benchmark Result ============
-Backend:                                 sglang-oai-chat
-Traffic request rate:                    inf
-Max request concurrency:                 100
-Successful requests:                     1000
-Benchmark duration (s):                  454.68
-Total input tokens:                      2481865
-Total input text tokens:                 85865
-Total input vision tokens:               2396000
-Total generated tokens:                  510855
-Total generated tokens (retokenized):    296466
-Request throughput (req/s):              2.20
-Input token throughput (tok/s):          5458.50
-Output token throughput (tok/s):         1123.55
-Peak output token throughput (tok/s):    5004.00
-Peak concurrent requests:                106
-Total token throughput (tok/s):          6582.05
-Concurrency:                             98.63
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   44844.92
-Median E2E Latency (ms):                 42866.15
-P90 E2E Latency (ms):                    82798.20
-P99 E2E Latency (ms):                    106306.30
----------------Time to First Token----------------
-Mean TTFT (ms):                          4507.79
-Median TTFT (ms):                        1180.83
-P99 TTFT (ms):                           39975.22
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          80.26
-Median TPOT (ms):                        82.38
-P99 TPOT (ms):                           152.89
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           100.66
-Median ITL (ms):                         13.26
-P95 ITL (ms):                            428.45
-P99 ITL (ms):                            1393.35
-Max ITL (ms):                            31943.26
-==================================================
-```
 
-### 5.2 Accuracy Benchmark
+### 5.2 准确性基准测试
 
-#### 5.2.1 MMMU Benchmark
+#### 5.2.1 MMMU 基准测试
 
-You can evaluate the model's accuracy using the MMMU dataset:
+您可以使用 MMMU 数据集评估模型的准确性：
 
-- Benchmark Command:
+- 基准测试命令：
 
 ```shell
 python3 benchmark/mmmu/bench_sglang.py \
     --port 30000 \
     --concurrency 64
-```
-```text
-Benchmark time: 97.75084622902796
-answers saved to: ./answer_sglang.json
-Evaluating...
-answers saved to: ./answer_sglang.json
-{'Accounting': {'acc': 0.633, 'num': 30},
- 'Agriculture': {'acc': 0.5, 'num': 30},
- 'Architecture_and_Engineering': {'acc': 0.367, 'num': 30},
- 'Art': {'acc': 0.767, 'num': 30},
- 'Art_Theory': {'acc': 0.9, 'num': 30},
- 'Basic_Medical_Science': {'acc': 0.7, 'num': 30},
- 'Biology': {'acc': 0.467, 'num': 30},
- 'Chemistry': {'acc': 0.433, 'num': 30},
- 'Clinical_Medicine': {'acc': 0.733, 'num': 30},
- 'Computer_Science': {'acc': 0.567, 'num': 30},
- 'Design': {'acc': 0.833, 'num': 30},
- 'Diagnostics_and_Laboratory_Medicine': {'acc': 0.467, 'num': 30},
- 'Economics': {'acc': 0.767, 'num': 30},
- 'Electronics': {'acc': 0.433, 'num': 30},
- 'Energy_and_Power': {'acc': 0.467, 'num': 30},
- 'Finance': {'acc': 0.533, 'num': 30},
- 'Geography': {'acc': 0.633, 'num': 30},
- 'History': {'acc': 0.7, 'num': 30},
- 'Literature': {'acc': 0.867, 'num': 30},
- 'Manage': {'acc': 0.633, 'num': 30},
- 'Marketing': {'acc': 0.733, 'num': 30},
- 'Materials': {'acc': 0.333, 'num': 30},
- 'Math': {'acc': 0.533, 'num': 30},
- 'Mechanical_Engineering': {'acc': 0.433, 'num': 30},
- 'Music': {'acc': 0.367, 'num': 30},
- 'Overall': {'acc': 0.62, 'num': 900},
- 'Overall-Art and Design': {'acc': 0.717, 'num': 120},
- 'Overall-Business': {'acc': 0.66, 'num': 150},
- 'Overall-Health and Medicine': {'acc': 0.693, 'num': 150},
- 'Overall-Humanities and Social Science': {'acc': 0.775, 'num': 120},
- 'Overall-Science': {'acc': 0.553, 'num': 150},
- 'Overall-Tech and Engineering': {'acc': 0.443, 'num': 210},
- 'Pharmacy': {'acc': 0.833, 'num': 30},
- 'Physics': {'acc': 0.7, 'num': 30},
- 'Psychology': {'acc': 0.767, 'num': 30},
- 'Public_Health': {'acc': 0.733, 'num': 30},
- 'Sociology': {'acc': 0.767, 'num': 30}}
-eval out saved to ./val_sglang.json
-Overall accuracy: 0.62
 ```

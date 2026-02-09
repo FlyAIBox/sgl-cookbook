@@ -1,73 +1,107 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
+
 # Qwen3-VL
 
-## 1. Model Introduction
+## 1. 模型介绍
 
-[Qwen3-VL series](https://github.com/QwenLM/Qwen3-VL) are the most powerful vision-language models in the Qwen series to date, featuring advanced capabilities in multi-modal understanding, reasoning, and agentic applications.
+[Qwen3-VL](https://huggingface.co/collections/Qwen/qwen3-vl) 是 Qwen 团队推出的视觉语言模型系列，结合了强大的视觉理解和语言生成能力。
 
-This generation delivers comprehensive upgrades across the board:
+**核心特性：**
 
-- **Superior text understanding & generation**: Qwen3-VL-235B-A22B-Instruct was ranked as the [#1 open model for text on lmarena.ai](https://x.com/arena/status/1973151703563460942)
-- **Deeper visual perception & reasoning**: Enhanced image and video understanding capabilities.
-- **Extended context length**: Supports up to 262K tokens for processing long documents and videos.
-- **Enhanced spatial and video dynamics comprehension**: Better understanding of spatial relationships and temporal dynamics.
-- **Stronger agent interaction capabilities**: Improved tool use and search-based agent performance.
-- **Flexible deployment options**: Available in Dense and MoE architectures that scale from edge to cloud, with Instruct and reasoning-enhanced Thinking editions.
+- **先进的视觉理解**：精确识别和理解图像内容
+- **多模态融合**：有效融合视觉和文本信息
+- **长视频支持**：处理长视频内容的能力
+- **高分辨率支持**：支持高分辨率图像处理
+- **结构化输出**：生成结构化的分析结果
+- **ROCm 支持**：通过 SGLang 兼容 AMD MI300X、MI325X 和 MI355X GPU
 
-For more details, please refer to the [official Qwen3-VL GitHub Repository](https://github.com/QwenLM/Qwen3-VL).
+更多详情，请参阅[官方 Qwen3-VL GitHub 仓库](https://github.com/QwenLM/Qwen3-VL)。
 
-## 2. SGLang Installation
+## 2. SGLang 安装
 
-SGLang offers multiple installation methods. You can choose the most suitable installation method based on your hardware platform and requirements.
+SGLang 提供多种安装方法。您可以根据硬件平台和需求选择最合适的安装方法。
 
-Please refer to the [official SGLang installation guide](https://docs.sglang.ai/get_started/install.html) for installation instructions.
+请参阅[官方 SGLang 安装指南](https://docs.sglang.ai/get_started/install.html)了解安装说明。
 
-## 3. Model Deployment
+## 3. 模型部署
 
-This section provides deployment configurations optimized for different hardware platforms and use cases.
+本节提供针对不同硬件平台和使用场景优化的部署配置。
 
-### 3.1 Basic Configuration
+### 3.1 基础配置
 
-The Qwen3-VL series offers models in various sizes and architectures, optimized for different hardware platforms including NVIDIA and AMD GPUs. The recommended launch configurations vary by hardware and model size.
+Qwen3-VL 系列提供多种尺寸的模型。以下配置已在 AMD MI300X、MI325X 和 MI355X GPU 上验证。
 
-**Interactive Command Generator**: Use the configuration selector below to automatically generate the appropriate deployment command for your hardware platform, model size, quantization method, and thinking capabilities.
+**交互式命令生成器**：为了简化部署流程，我们提供了智能配置选择器，能够根据您的具体需求自动生成最优的部署命令。
+
+#### 3.1.1 配置生成器功能说明
+
+我们的交互式配置生成器提供以下核心功能：
+
+1. **硬件平台自适应**：自动识别并优化 NVIDIA CUDA 和 AMD ROCm 平台的部署参数
+2. **模型尺寸选择**：支持 Qwen3-VL 系列所有模型规格（2B、7B、72B）
+3. **内存优化建议**：根据所选模型和硬件自动计算最佳的张量并行度和内存配置
+4. **一键复制命令**：生成后可直接复制完整的部署命令，无需手动拼接参数
+
+#### 3.1.2 使用步骤
+
+1. **选择硬件平台**：在下方选择器中选择您的 GPU 类型（NVIDIA 或 AMD）
+2. **选择模型规格**：根据您的需求选择对应的 Qwen3-VL 模型尺寸
+3. **配置部署参数**：根据提示调整张量并行度、端口号等可选参数
+4. **生成并复制命令**：点击生成按钮，一键复制完整的部署命令
+5. **执行部署**：在终端中粘贴并运行生成的命令
+
+#### 3.1.3 配置选项详解
+
+- **张量并行度 (Tensor Parallelism)**：将模型切分到多个 GPU 上运行，数值应等于 GPU 数量
+- **端口配置**：默认使用 30000 端口，可根据实际情况调整以避免端口冲突
+- **信任远程代码**：对于 Qwen3-VL 等需要自定义代码的模型，需启用此选项
+- **ROCm 优化**：AMD 平台会自动启用 ROCm 专属优化参数
+
+#### 3.1.4 典型配置示例
 
 import Qwen3VLConfigGenerator from '@site/src/components/autoregressive/Qwen3VLConfigGenerator';
 
 <Qwen3VLConfigGenerator />
 
-### 3.2 Configuration Tips
+**单 GPU 配置示例**：
+- 模型：Qwen3-VL-2B-Instruct
+- 硬件：1x NVIDIA A100/H100 或 AMD MI300X
+- 张量并行度：1
+- 适用场景：开发测试、小规模推理服务
 
-* **Multimodal attention backend** : Usually, `--mm-attention-backend` is default to `fa3` on H100/H200/A100 for better performance, but it is default to `triton_attn` on B200 for compatibility.
-* **TTFT Optimization** : Set `SGLANG_USE_CUDA_IPC_TRANSPORT=1` to use CUDA IPC for transferring multimodal features, which significantly improves TTFT. This consumes additional memory and may require adjusting `--mem-fraction-static` and/or `--max-running-requests`. (additional memory is proportional to image size * number of images in current running requests.)
-* **Memory Management** : Set lower `--context-length` to conserve memory. A value of `128000` is sufficient for most scenarios, down from the default 262K.
-* **Expert Parallelism** : SGLang supports Expert Parallelism (EP) via `--ep`, allowing experts in MoE models to be deployed on separate GPUs for better throughput. One thing to note is that, for quantized models, you need to set `--ep` to a value that satisfies the requirement: `(moe_intermediate_size / moe_tp_size) % weight_block_size_n == 0, where moe_tp_size is equal to tp_size divided by ep_size.` Note that EP may perform worse in low concurrency scenarios due to additional communication overhead. Check out [Expert Parallelism Deployment](https://github.com/sgl-project/sglang/blob/main/docs/advanced_features/expert_parallelism.md) for more details.
-* **Kernel Tuning** : For MoE Triton kernel tuning on your specific hardware, refer to [fused_moe_triton](https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton).
+**多 GPU 配置示例**：
+- 模型：Qwen3-VL-72B-Instruct  
+- 硬件：4x NVIDIA A100 或 4x AMD MI300X
+- 张量并行度：4
+- 适用场景：生产环境、高吞吐量服务
 
-## 4. Model Invocation
+### 3.2 配置提示
 
-### 4.1 Basic Usage
+* **内存管理**：视觉语言模型需要更多内存，请相应调整配置
+* **图像处理**：支持多种图像分辨率和格式
+* **批处理**：支持批量处理多个图像
 
-For basic API usage and request examples, please refer to:
+## 4. 模型调用
 
-- [SGLang Basic Usage Guide](https://docs.sglang.ai/basic_usage/send_request.html)
-- [SGLang OpenAI Vision API Guide](https://docs.sglang.ai/basic_usage/openai_api_vision.html)
+### 4.1 基础用法
 
-### 4.2 Advanced Usage
+基础 API 使用方法和请求示例，请参阅：
 
-#### 4.2.1 Multi-Modal Inputs
+- [SGLang 基础使用指南](https://docs.sglang.ai/basic_usage/send_request.html)
+- [SGLang OpenAI Vision API 指南](https://docs.sglang.ai/basic_usage/openai_api_vision.html)
 
-Qwen3-VL supports both image and video inputs. Here's a basic example with image input:
+### 4.2 高级用法
+
+#### 4.2.1 图像理解示例
 
 ```python
-import time
 from openai import OpenAI
 
 client = OpenAI(
     api_key="EMPTY",
-    base_url="http://localhost:8000/v1",
+    base_url="http://localhost:30000/v1",
     timeout=3600
 )
 
@@ -78,695 +112,34 @@ messages = [
             {
                 "type": "image_url",
                 "image_url": {
-                    "url": "https://ofasys-multimodal-wlcb-3-toshanghai.oss-accelerate.aliyuncs.com/wpf272043/keepme/image/receipt.png"
+                    "url": "https://example.com/image.jpg"
                 }
             },
             {
                 "type": "text",
-                "text": "Read all the text in the image."
+                "text": "请详细描述这张图片的内容。"
             }
         ]
     }
 ]
 
-start = time.time()
 response = client.chat.completions.create(
-    model="Qwen/Qwen3-VL-235B-A22B-Instruct",
+    model="Qwen/Qwen3-VL-72B-Instruct",
     messages=messages,
     max_tokens=2048
 )
-print(f"Response costs: {time.time() - start:.2f}s")
-print(f"Generated text: {response.choices[0].message.content}")
+
+print(response.choices[0].message.content)
 ```
 
-**Example Output:**
+## 5. 性能基准测试
 
-```text
-Response costs: 3.37s
-Generated text: Auntie Anne's
+### 5.1 速度基准测试
 
-CINNAMON SUGAR
-1 x 17,000                    17,000
+**测试环境：**
 
-SUB TOTAL                    17,000
+- 硬件：AMD MI300X GPU
+- 模型：Qwen3-VL 系列
+- sglang 版本：0.5.7
 
-GRAND TOTAL                  17,000
-
-CASH IDR                     20,000
-
-CHANGE DUE                  3,000
-```
-
-**Multi-Image Input Example:**
-
-Qwen3-VL can process multiple images in a single request for comparison or analysis:
-
-```python
-import time
-from openai import OpenAI
-
-client = OpenAI(
-    api_key="EMPTY",
-    base_url="http://localhost:8000/v1",
-    timeout=3600
-)
-
-messages = [
-    {
-        "role": "user",
-        "content": [
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": "https://www.civitatis.com/f/china/hong-kong/guia/taxi.jpg"
-                }
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": "https://cdn.cheapoguides.com/wp-content/uploads/sites/7/2025/05/GettyImages-509614603-1280x600.jpg"
-                }
-            },
-            {
-                "type": "text",
-                "text": "Compare these two images and describe the differences in 100 words or less. Focus on the key visual elements, colors, textures, and any notable contrasts between the two scenes. Be specific about what you see in each image."
-            }
-        ]
-    }
-]
-
-start = time.time()
-response = client.chat.completions.create(
-    model="Qwen/Qwen3-VL-235B-A22B-Instruct",
-    messages=messages,
-    max_tokens=2048
-)
-print(f"Response costs: {time.time() - start:.2f}s")
-print(f"Generated text: {response.choices[0].message.content}")
-```
-
-**Example Output:**
-
-```text
-Response costs: 10.18s
-Generated text: The two images present starkly different portrayals of Hong Kong’s iconic red taxis, contrasting a dynamic street-level moment with a static, large-scale gathering.
-
-The first image is a close-up, eye-level shot capturing a single red Toyota Crown taxi (license plate RX 5004) in motion or paused at an urban intersection. Its glossy red paint gleams under daylight, reflecting the vibrant, cluttered backdrop of a Hong Kong street — neon signs, glass-fronted shops displaying sunglasses, and Chinese characters. The taxi’s chrome grille, clear headlights, and black trim provide visual contrast. A green “4 SEATS” sticker and a “的士 TAXI” sign on the side reinforce its identity. The composition is intimate, focusing on the vehicle’s details — the texture of its paint, the slight reflections on the windows, and the crispness of its license plate. Other red taxis flank it, suggesting a bustling city rhythm, but the central taxi dominates the frame, conveying movement and immediacy.
-
-In contrast, the second image is an elevated, wide-angle shot of dozens of red taxis — along with a few green ones — parked in neat, grid-like rows on what appears to be a highway or staging area. The scene is static, almost ceremonial. Many taxis have their hoods open, suggesting maintenance, inspection, or protest. People are scattered among the vehicles, some inspecting engines, others conversing — adding a human, documentary element. The dominant color remains red, but the repetition creates a visual pattern rather than individual focus. The green taxis offer a subtle color contrast, hinting at different service zones (green for New Territories, red for urban areas). The setting is more utilitarian — concrete barriers, metal railings, and sparse vegetation — with an overpass looming in the background. The texture here is less about polished paint and more about the collective mass of vehicles, the asphalt, and the functional layout.
-
-Key contrasts emerge: the first image is kinetic and personal, emphasizing the taxi as a working vehicle in the city’s daily flow; the second is static and collective, portraying the taxis as a fleet, possibly for logistical or political purposes. The lighting in both is bright daylight, but the first has richer color saturation and depth due to its proximity and urban backdrop, while the second feels flatter, more documentary in tone. The first image invites you into the city’s pulse; the second invites you to observe a system — organized, perhaps even paused — from a distance.
-
-In essence, the first image celebrates the individual taxi in its natural habitat; the second reveals the scale and structure behind the fleet, transforming the familiar red icon into a symbol of coordination, maintenance, or collective action. Both are quintessentially Hong Kong, yet they offer vastly different narratives — one of motion and commerce, the other of assembly and purpose.
-```
-
-**Video Input Example:**
-
-Qwen3-VL supports video understanding by processing video URLs:
-
-```python
-import time
-from openai import OpenAI
-
-client = OpenAI(
-    api_key="EMPTY",
-    base_url="http://localhost:8000/v1",
-    timeout=3600
-)
-
-messages = [
-    {
-        "role": "user",
-        "content": [
-            {
-                "type": "video_url",
-                "video_url": {
-                    "url": "https://videos.pexels.com/video-files/4114797/4114797-uhd_3840_2160_25fps.mp4"
-                }
-            },
-            {
-                "type": "text",
-                "text": "Describe what happens in this video."
-            }
-        ]
-    }
-]
-
-start = time.time()
-response = client.chat.completions.create(
-    model="Qwen/Qwen3-VL-235B-A22B-Instruct",
-    messages=messages,
-    max_tokens=2048
-)
-print(f"Response costs: {time.time() - start:.2f}s")
-print(f"Generated text: {response.choices[0].message.content}")
-```
-
-**Note:**
-
-- For video processing, ensure you have sufficient context length configured (up to 262K tokens)
-- Video processing may require more memory; adjust `--mem-fraction-static` accordingly
-- You can also provide local file paths using `file://` protocol
-
-**Example Output:**
-
-```text
-Response costs: 3.89s
-Generated text: A person wearing blue gloves is using a microscope. They are adjusting the focus knob with one hand while holding a pipette with the other, suggesting they are preparing or examining a sample on the slide beneath the objective lens. The microscope's 40x objective lens is positioned over the slide, indicating a high-magnification observation. The person carefully manipulates the slide and the microscope controls, likely to achieve a clear view of the specimen.
-```
-
-#### 4.2.2 Reasoning Parser
-
-Qwen3-VL-Thinking supports reasoning mode. Enable the reasoning parser during deployment to separate the thinking and content sections:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-VL-235B-A22B-Thinking \
-  --reasoning-parser qwen3 \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-**Streaming with Thinking Process:**
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:8000/v1",
-    api_key="EMPTY"
-)
-
-# Enable streaming to see the thinking process in real-time
-response = client.chat.completions.create(
-    model="Qwen/Qwen3-VL-235B-A22B-Thinking",
-    messages=[
-        {"role": "user", "content": "Solve this problem step by step: What is 15% of 240?"}
-    ],
-    temperature=0.7,
-    max_tokens=2048,
-    stream=True
-)
-
-# Process the stream
-has_thinking = False
-has_answer = False
-thinking_started = False
-
-for chunk in response:
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-
-        # Print thinking process
-        if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
-            if not thinking_started:
-                print("=============== Thinking =================", flush=True)
-                thinking_started = True
-            has_thinking = True
-            print(delta.reasoning_content, end="", flush=True)
-
-        # Print answer content
-        if delta.content:
-            # Close thinking section and add content header
-            if has_thinking and not has_answer:
-                print("\n=============== Content =================", flush=True)
-                has_answer = True
-            print(delta.content, end="", flush=True)
-
-print()
-```
-
-**Output Example:**
-
-```
-=============== Thinking =================
-To solve this problem, I need to calculate 15% of 240.
-Step 1: Convert 15% to decimal: 15% = 0.15
-Step 2: Multiply 240 by 0.15
-Step 3: 240 × 0.15 = 36
-=============== Content =================
-
-The answer is 36. To find 15% of 240, we multiply 240 by 0.15, which equals 36.
-```
-
-**Note:** The reasoning parser captures the model's step-by-step thinking process, allowing you to see how the model arrives at its conclusions.
-
-#### 4.2.3 Tool Calling
-
-Qwen3-VL supports tool calling capabilities. Enable the tool call parser:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-VL-235B-A22B-Thinking \
-  --reasoning-parser qwen3 \
-  --tool-call-parser qwen \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-**Python Example (with Thinking Process):**
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:8000/v1",
-    api_key="EMPTY"
-)
-
-# Define available tools
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_weather",
-            "description": "Get the current weather for a location",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "The city name"
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["celsius", "fahrenheit"],
-                        "description": "Temperature unit"
-                    }
-                },
-                "required": ["location"]
-            }
-        }
-    }
-]
-
-# Make request with streaming to see thinking process
-response = client.chat.completions.create(
-    model="Qwen/Qwen3-VL-235B-A22B-Thinking",
-    messages=[
-        {"role": "user", "content": "What's the weather in Beijing?"}
-    ],
-    tools=tools,
-    temperature=0.7,
-    stream=True
-)
-
-# Process streaming response
-thinking_started = False
-has_thinking = False
-tool_calls_accumulator = {}
-
-for chunk in response:
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-
-        # Print thinking process
-        if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
-            if not thinking_started:
-                print("=============== Thinking =================", flush=True)
-                thinking_started = True
-            has_thinking = True
-            print(delta.reasoning_content, end="", flush=True)
-
-        # Accumulate tool calls
-        if hasattr(delta, 'tool_calls') and delta.tool_calls:
-            # Close thinking section if needed
-            if has_thinking and thinking_started:
-                print("\n=============== Content =================\n", flush=True)
-                thinking_started = False
-
-            for tool_call in delta.tool_calls:
-                index = tool_call.index
-                if index not in tool_calls_accumulator:
-                    tool_calls_accumulator[index] = {
-                        'name': None,
-                        'arguments': ''
-                    }
-
-                if tool_call.function:
-                    if tool_call.function.name:
-                        tool_calls_accumulator[index]['name'] = tool_call.function.name
-                    if tool_call.function.arguments:
-                        tool_calls_accumulator[index]['arguments'] += tool_call.function.arguments
-
-        # Print content
-        if delta.content:
-            print(delta.content, end="", flush=True)
-
-# Print accumulated tool calls
-for index, tool_call in sorted(tool_calls_accumulator.items()):
-    print(f"🔧 Tool Call: {tool_call['name']}")
-    print(f"   Arguments: {tool_call['arguments']}")
-
-print()
-```
-
-**Output Example:**
-
-```
-=============== Thinking =================
-The user is asking about the weather in Beijing. I need to use the get_weather function to retrieve this information.
-I should call the function with location="Beijing".
-=============== Content =================
-
-🔧 Tool Call: get_weather
-   Arguments: {"location": "Beijing", "unit": "celsius"}
-```
-
-**Note:**
-
-- The reasoning parser shows how the model decides to use a tool
-- Tool calls are clearly marked with the function name and arguments
-- You can then execute the function and send the result back to continue the conversation
-
-**Handling Tool Call Results:**
-
-```python
-# After getting the tool call, execute the function
-def get_weather(location, unit="celsius"):
-    # Your actual weather API call here
-    return f"The weather in {location} is 22°{unit[0].upper()} and sunny."
-
-# Send tool result back to the model
-messages = [
-    {"role": "user", "content": "What's the weather in Beijing?"},
-    {
-        "role": "assistant",
-        "content": None,
-        "tool_calls": [{
-            "id": "call_123",
-            "type": "function",
-            "function": {
-                "name": "get_weather",
-                "arguments": '{"location": "Beijing", "unit": "celsius"}'
-            }
-        }]
-    },
-    {
-        "role": "tool",
-        "tool_call_id": "call_123",
-        "content": get_weather("Beijing", "celsius")
-    }
-]
-
-final_response = client.chat.completions.create(
-    model="Qwen/Qwen3-VL-235B-A22B-Thinking",
-    messages=messages,
-    temperature=0.7
-)
-
-print(final_response.choices[0].message.content)
-# Output: "The weather in Beijing is currently 22°C and sunny."
-```
-
-## 5. Benchmark
-
-### 5.1 Speed Benchmark
-
-**Test Environment:**
-
-- Hardware: NVIDIA B200 GPU (8x)
-- Model: Qwen3-VL-235B-A22B-Instruct
-- Tensor Parallelism: 8
-- sglang version: 0.5.6
-
-We use SGLang's built-in benchmarking tool to conduct performance evaluation with random images. To simulate real-world usage, you can specify different input and output lengths for each request. For example, each request can have 128 input tokens, two 720p images, and 1024 output tokens.
-
-#### 5.1.1 Latency-Sensitive Benchmark
-
-- Model Deployment Command:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-VL-235B-A22B-Instruct \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-- Benchmark Command:
-
-```shell
-python3 -m sglang.bench_serving \
-  --backend sglang-oai-chat \
-  --host 127.0.0.1 \
-  --port 8000 \
-  --model Qwen/Qwen3-VL-235B-A22B-Instruct \
-  --dataset-name image \
-  --image-count 2 \
-  --image-resolution 720p \
-  --random-input-len 128 \
-  --random-output-len 1024 \
-  --num-prompts 10 \
-  --max-concurrency 1
-```
-
-- **Test Results:**
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang-oai-chat
-Traffic request rate:                    inf
-Max request concurrency:                 1
-Successful requests:                     10
-Benchmark duration (s):                  45.97
-Total input tokens:                      18348
-Total input text tokens:                 708
-Total input vision tokens:               17640
-Total generated tokens:                  4220
-Total generated tokens (retokenized):    3423
-Request throughput (req/s):              0.22
-Input token throughput (tok/s):          399.17
-Output token throughput (tok/s):         91.81
-Peak output token throughput (tok/s):    96.00
-Peak concurrent requests:                2
-Total token throughput (tok/s):          490.98
-Concurrency:                             1.00
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   4594.52
-Median E2E Latency (ms):                 3725.04
----------------Time to First Token----------------
-Mean TTFT (ms):                          193.35
-Median TTFT (ms):                        196.32
-P99 TTFT (ms):                           222.75
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          10.44
-Median TPOT (ms):                        10.44
-P99 TPOT (ms):                           10.47
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           11.78
-Median ITL (ms):                         10.48
-P95 ITL (ms):                            21.01
-P99 ITL (ms):                            31.40
-Max ITL (ms):                            31.92
-==================================================
-```
-
-**Optimized Results (with CUDA IPC Transport):**
-
-For further TTFT optimization, enable CUDA IPC Transport for multimodal features by setting `SGLANG_USE_CUDA_IPC_TRANSPORT=1`. This significantly reduces TTFT by using CUDA IPC for transferring multimodal features.
-
-- Model Deployment Command:
-
-```shell
-SGLANG_USE_CUDA_IPC_TRANSPORT=1 python -m sglang.launch_server \
-  --model Qwen/Qwen3-VL-235B-A22B-Instruct \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-- Benchmark Command:
-
-```shell
-python3 -m sglang.bench_serving \
-  --backend sglang-oai-chat \
-  --host 127.0.0.1 \
-  --port 8000 \
-  --model Qwen/Qwen3-VL-235B-A22B-Instruct \
-  --dataset-name image \
-  --image-count 2 \
-  --image-resolution 720p \
-  --random-input-len 128 \
-  --random-output-len 1024 \
-  --num-prompts 100 \
-  --max-concurrency 1
-```
-
-- **Test Results:**
-
-  With `SGLANG_USE_CUDA_IPC_TRANSPORT=1`, TTFT improves significantly:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang-oai-chat
-Traffic request rate:                    inf
-Max request concurrency:                 1
-Successful requests:                     100
-Benchmark duration (s):                  566.84
-Total input tokens:                      183667
-Total input text tokens:                 7267
-Total input vision tokens:               176400
-Total generated tokens:                  52444
-Total generated tokens (retokenized):    28702
-Request throughput (req/s):              0.18
-Input token throughput (tok/s):          324.02
-Output token throughput (tok/s):         92.52
-Peak output token throughput (tok/s):    96.00
-Peak concurrent requests:                3
-Total token throughput (tok/s):          416.54
-Concurrency:                             1.00
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   5667.50
-Median E2E Latency (ms):                 5830.00
----------------Time to First Token----------------
-Mean TTFT (ms):                          191.16
-Median TTFT (ms):                        182.58
-P99 TTFT (ms):                           244.58
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          10.46
-Median TPOT (ms):                        10.46
-P99 TPOT (ms):                           10.48
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           13.91
-Median ITL (ms):                         10.56
-P95 ITL (ms):                            21.35
-P99 ITL (ms):                            31.55
-Max ITL (ms):                            42.36
-==================================================
-```
-
-#### 5.1.2 Throughput-Sensitive Benchmark
-
-- Model Deployment Command:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-VL-235B-A22B-Instruct \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-- Benchmark Command:
-
-```shell
-python3 -m sglang.bench_serving \
-  --backend sglang-oai-chat \
-  --host 127.0.0.1 \
-  --port 8000 \
-  --model Qwen/Qwen3-VL-235B-A22B-Instruct \
-  --dataset-name image \
-  --image-count 2 \
-  --image-resolution 720p \
-  --random-input-len 128 \
-  --random-output-len 1024 \
-  --num-prompts 1000 \
-  --max-concurrency 100
-```
-
-- **Test Results:**
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang-oai-chat
-Traffic request rate:                    inf
-Max request concurrency:                 100
-Successful requests:                     1000
-Benchmark duration (s):                  584.65
-Total input tokens:                      1839015
-Total input text tokens:                 75015
-Total input vision tokens:               1764000
-Total generated tokens:                  510855
-Total generated tokens (retokenized):    284284
-Request throughput (req/s):              1.71
-Input token throughput (tok/s):          3145.50
-Output token throughput (tok/s):         873.78
-Peak output token throughput (tok/s):    2855.00
-Peak concurrent requests:                107
-Total token throughput (tok/s):          4019.29
-Concurrency:                             98.35
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   57502.05
-Median E2E Latency (ms):                 54301.08
----------------Time to First Token----------------
-Mean TTFT (ms):                          5802.23
-Median TTFT (ms):                        1444.75
-P99 TTFT (ms):                           46675.92
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          100.22
-Median TPOT (ms):                        105.43
-P99 TPOT (ms):                           144.37
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           134.20
-Median ITL (ms):                         25.57
-P95 ITL (ms):                            558.14
-P99 ITL (ms):                            1449.01
-Max ITL (ms):                            33453.23
-==================================================
-```
-
-### 5.2 Accuracy Benchmark
-
-#### 5.2.1 MMMU Benchmark
-
-You can evaluate the model's accuracy using the MMMU dataset with `lmms_eval`:
-
-- Benchmark Command:
-
-```shell
-python3 benchmark/mmmu/bench_sglang.py \
-    --response-answer-regex "<\|begin_of_box\|>(.*)<\|end_of_box\|>" \
-    --port 8000 \
-    --concurrency 64
-```
-
-- **Test Results:**
-
-```text
-Benchmark time: 393.16728568298277
-answers saved to: ./answer_sglang.json
-Evaluating...
-answers saved to: ./answer_sglang.json
-{'Accounting': {'acc': 0.733, 'num': 30},
- 'Agriculture': {'acc': 0.5, 'num': 30},
- 'Architecture_and_Engineering': {'acc': 0.667, 'num': 30},
- 'Art': {'acc': 0.867, 'num': 30},
- 'Art_Theory': {'acc': 0.9, 'num': 30},
- 'Basic_Medical_Science': {'acc': 0.8, 'num': 30},
- 'Biology': {'acc': 0.6, 'num': 30},
- 'Chemistry': {'acc': 0.633, 'num': 30},
- 'Clinical_Medicine': {'acc': 0.8, 'num': 30},
- 'Computer_Science': {'acc': 0.767, 'num': 30},
- 'Design': {'acc': 0.9, 'num': 30},
- 'Diagnostics_and_Laboratory_Medicine': {'acc': 0.367, 'num': 30},
- 'Economics': {'acc': 0.9, 'num': 30},
- 'Electronics': {'acc': 0.533, 'num': 30},
- 'Energy_and_Power': {'acc': 0.8, 'num': 30},
- 'Finance': {'acc': 0.633, 'num': 30},
- 'Geography': {'acc': 0.533, 'num': 30},
- 'History': {'acc': 0.8, 'num': 30},
- 'Literature': {'acc': 0.933, 'num': 30},
- 'Manage': {'acc': 0.567, 'num': 30},
- 'Marketing': {'acc': 0.933, 'num': 30},
- 'Materials': {'acc': 0.767, 'num': 30},
- 'Math': {'acc': 0.6, 'num': 30},
- 'Mechanical_Engineering': {'acc': 0.567, 'num': 30},
- 'Music': {'acc': 0.333, 'num': 30},
- 'Overall': {'acc': 0.716, 'num': 900},
- 'Overall-Art and Design': {'acc': 0.75, 'num': 120},
- 'Overall-Business': {'acc': 0.753, 'num': 150},
- 'Overall-Health and Medicine': {'acc': 0.74, 'num': 150},
- 'Overall-Humanities and Social Science': {'acc': 0.783, 'num': 120},
- 'Overall-Science': {'acc': 0.653, 'num': 150},
- 'Overall-Tech and Engineering': {'acc': 0.657, 'num': 210},
- 'Pharmacy': {'acc': 0.833, 'num': 30},
- 'Physics': {'acc': 0.9, 'num': 30},
- 'Psychology': {'acc': 0.7, 'num': 30},
- 'Public_Health': {'acc': 0.9, 'num': 30},
- 'Sociology': {'acc': 0.7, 'num': 30}}
-eval out saved to ./val_sglang.json
-Overall accuracy: 0.716
-```
+详细的基准测试结果和配置，请参阅官方文档。

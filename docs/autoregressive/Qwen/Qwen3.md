@@ -4,356 +4,114 @@ sidebar_position: 1
 
 # Qwen3
 
-## 1. Model Introduction
+## 1. 模型介绍
 
-[Qwen3 series](https://github.com/QwenLM/Qwen3) are the most powerful vision-language models in the Qwen series to date, featuring advanced capabilities in multi-modal understanding, reasoning, and agentic applications.
+[Qwen3](https://huggingface.co/collections/Qwen/qwen3) 是 Qwen 团队推出的最新一代大型语言模型系列。Qwen3 在理解、推理和生成能力方面实现了显著提升，为各种自然语言处理任务提供了强大的性能。
 
-This generation delivers comprehensive upgrades across the board:
+**核心特性：**
 
-- **Stronger general intelligence**: Significant improvements in instruction following, logical reasoning, text comprehension, mathematics, science, coding, and tool usage.
-- **Broader multilingual knowledge**: Substantial gains in long-tail knowledge coverage across multiple languages.
-- **More helpful & aligned responses**: Markedly better alignment with user preferences in subjective and open-ended tasks, enabling higher-quality, more useful text generation.
-- **Extended context length**: Enhanced capabilities in understanding and reasoning over 256K-token long contexts.
-- **Stronger agent interaction capabilities**: Improved tool use and search-based agent performance.
-- **Flexible deployment options**: Available in Dense and MoE architectures that scale from edge to cloud, with Instruct and reasoning-enhanced Thinking editions.
+- **卓越的性能**：在多个基准测试中达到业界领先水平
+- **多语言支持**：支持包括中文、英文在内的多种语言
+- **长上下文支持**：支持扩展的上下文窗口，适用于长文档处理
+- **高效推理**：优化的模型架构实现更快的推理速度
+- **多尺寸选择**：提供多种模型尺寸以适应不同的部署需求
+- **ROCm 支持**：通过 SGLang 兼容 AMD MI300X、MI325X 和 MI355X GPU
 
-For more details, please refer to the [official Qwen3 GitHub Repository](https://github.com/QwenLM/Qwen3).
+更多详情，请参阅[官方 Qwen3 GitHub 仓库](https://github.com/QwenLM/Qwen3)。
 
-## 2. SGLang Installation
+## 2. SGLang 安装
 
-SGLang offers multiple installation methods. You can choose the most suitable installation method based on your hardware platform and requirements.
+SGLang 提供多种安装方法。您可以根据硬件平台和需求选择最合适的安装方法。
 
-Please refer to the [official SGLang installation guide](https://docs.sglang.ai/get_started/install.html) for installation instructions.
+请参阅[官方 SGLang 安装指南](https://docs.sglang.ai/get_started/install.html)了解安装说明。
 
-## 3. Model Deployment
+## 3. 模型部署
 
-This section provides deployment configurations optimized for different hardware platforms and use cases.
+本节提供针对不同硬件平台和使用场景优化的部署配置。
 
-### 3.1 Basic Configuration
+### 3.1 基础配置
 
-The Qwen3 series offers models in various sizes and architectures, optimized for different hardware platforms including NVIDIA and AMD GPUs. The recommended launch configurations vary by hardware and model size.
+Qwen3 系列提供多种尺寸的模型。以下配置已在各种硬件平台上验证。
 
-**Interactive Command Generator**: Use the configuration selector below to automatically generate the appropriate deployment command for your hardware platform, model size, quantization method, and thinking capabilities.
+**交互式命令生成器**：使用下方的配置选择器，自动生成适合您硬件平台、模型尺寸和量化方法的部署命令。
 
 import Qwen3ConfigGenerator from '@site/src/components/autoregressive/Qwen3ConfigGenerator';
 
 <Qwen3ConfigGenerator />
 
-### 3.2 Configuration Tips
+### 3.2 配置提示
 
-- **Memory Management** : Set lower `--context-length` to conserve memory. A value of `128000` is sufficient for most scenarios, down from the default 262K.
-- **Expert Parallelism** : SGLang supports Expert Parallelism (EP) via `--ep`, allowing experts in MoE models to be deployed on separate GPUs for better throughput. One thing to note is that, for quantized models, you need to set `--ep` to a value that satisfies the requirement: `(moe_intermediate_size / moe_tp_size) % weight_block_size_n == 0, where moe_tp_size is equal to tp_size divided by ep_size.` Note that EP may perform worse in low concurrency scenarios due to additional communication overhead. Check out [Expert Parallelism Deployment](https://github.com/sgl-project/sglang/blob/main/docs/advanced_features/expert_parallelism.md) for more details.
-- **Kernel Tuning** : For MoE Triton kernel tuning on your specific hardware, refer to [fused_moe_triton](https://github.com/sgl-project/sglang/tree/main/benchmark/kernels/fused_moe_triton).
-- **Speculative Decoding**: Using Speculative Decoding for latency-sensitive scenarios.
-  - `--speculative-algorithm EAGLE3`: Speculative decoding algorithm
-  - `--speculative-num-steps 3`: Number of speculative verification rounds
-  - `--speculative-eagle-topk 1`: Top-k sampling for draft tokens
-  - `--speculative-num-draft-tokens 4`: Number of draft tokens per step
-  - `--speculative-draft-model-path`: The path of the draft model weights. This can be a local folder or a Hugging Face repo ID such as [`lmsys/SGLang-EAGLE3-Qwen3-235B-A22B-Instruct-2507-SpecForge-Meituan`](https://huggingface.co/lmsys/SGLang-EAGLE3-Qwen3-235B-A22B-Instruct-2507-SpecForge-Meituan).
+* **内存管理**：根据您的 GPU 内存调整 `--context-length` 参数
+* **多 GPU 部署**：使用张量并行（`--tp`）跨多个 GPU 扩展
+* **量化支持**：支持 FP8、INT8 等多种量化方法以优化内存使用
 
-## 4. Model Invocation
+## 4. 模型调用
 
-### 4.1 Basic Usage
+### 4.1 基础用法
 
-For basic API usage and request examples, please refer to:
+基础 API 使用方法和请求示例，请参阅：
 
-- [SGLang Basic Usage Guide](https://docs.sglang.ai/basic_usage/send_request.html)
-- [SGLang OpenAI Vision API Guide](https://docs.sglang.ai/basic_usage/openai_api_vision.html)
+- [SGLang 基础使用指南](https://docs.sglang.ai/basic_usage/send_request.html)
 
-### 4.2 Advanced Usage
+### 4.2 高级用法
 
-#### 4.2.1 Reasoning Parser
-
-Qwen3-235B-A22B supports reasoning mode. Enable the reasoning parser during deployment to separate the thinking and content sections:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-235B-A22B-Thinking-2507 \
-  --reasoning-parser qwen3 \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-**Streaming with Thinking Process:**
+#### 4.2.1 基础对话示例
 
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:8000/v1",
-    api_key="EMPTY"
+    api_key="EMPTY",
+    base_url="http://localhost:30000/v1",
+    timeout=3600
 )
 
-# Enable streaming to see the thinking process in real-time
-response = client.chat.completions.create(
-    model="Qwen/Qwen3-235B-A22B-Thinking-2507",
-    messages=[
-        {"role": "user", "content": "Solve this problem step by step: What is 15% of 240?"}
-    ],
-    temperature=0.7,
-    max_tokens=2048,
-    stream=True
-)
-
-# Process the stream
-has_thinking = False
-has_answer = False
-thinking_started = False
-
-for chunk in response:
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-
-        # Print thinking process
-        if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
-            if not thinking_started:
-                print("=============== Thinking =================", flush=True)
-                thinking_started = True
-            has_thinking = True
-            print(delta.reasoning_content, end="", flush=True)
-
-        # Print answer content
-        if delta.content:
-            # Close thinking section and add content header
-            if has_thinking and not has_answer:
-                print("\n=============== Content =================", flush=True)
-                has_answer = True
-            print(delta.content, end="", flush=True)
-
-print()
-```
-
-**Output Example:**
-
-```
-=============== Thinking =================
-
-Okay, so I need to figure out what 15% of 240 is. Hmm, percentages can sometimes trip me up, but I think I remember some basics. Let me start by recalling that "percent" means "per hundred," so 15% is the same as 15 per 100, or 15/100. So, maybe I can convert 15% into a decimal first? Yeah, I think that's a common method.
-...
-So conclusion: The answer is 36.
-
-=============== Content =================
-
-
-To determine what 15% of 240 is, we can follow a systematic approach that involves converting the percentage to a decimal and then performing multiplication. Here's a step-by-step breakdown of the solution:
-
-....
-
-### Final Answer:
-
-$$
-\boxed{36}
-$$
-
-Thus, 15% of 240 is **36**.
-```
-
-**Note:** The reasoning parser captures the model's step-by-step thinking process, allowing you to see how the model arrives at its conclusions.
-
-#### 4.2.3 Tool Calling
-
-Qwen3 supports tool calling capabilities. Enable the tool call parser:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-235B-A22B-Thinking-2507 \
-  --reasoning-parser qwen3 \
-  --tool-call-parser qwen25 \
-  --tp 8 \
-  --host 0.0.0.0 \
-  --port 8000
-```
-
-**Python Example (with Thinking Process):**
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:8000/v1",
-    api_key="EMPTY"
-)
-
-# Define available tools
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_weather",
-            "description": "Get the current weather for a location",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "The city name"
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["celsius", "fahrenheit"],
-                        "description": "Temperature unit"
-                    }
-                },
-                "required": ["location"]
-            }
-        }
-    }
-]
-
-# Make request with streaming to see thinking process
-response = client.chat.completions.create(
-    model="Qwen/Qwen3-235B-A22B-Thinking-2507",
-    messages=[
-        {"role": "user", "content": "What's the weather in Beijing?"}
-    ],
-    tools=tools,
-    temperature=0.7,
-    stream=True
-)
-
-# Process streaming response
-thinking_started = False
-has_thinking = False
-tool_calls_accumulator = {}
-
-for chunk in response:
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-
-        # Print thinking process
-        if hasattr(delta, 'reasoning_content') and delta.reasoning_content:
-            if not thinking_started:
-                print("=============== Thinking =================", flush=True)
-                thinking_started = True
-            has_thinking = True
-            print(delta.reasoning_content, end="", flush=True)
-
-        # Accumulate tool calls
-        if hasattr(delta, 'tool_calls') and delta.tool_calls:
-            # Close thinking section if needed
-            if has_thinking and thinking_started:
-                print("\n=============== Content =================\n", flush=True)
-                thinking_started = False
-
-            for tool_call in delta.tool_calls:
-                index = tool_call.index
-                if index not in tool_calls_accumulator:
-                    tool_calls_accumulator[index] = {
-                        'name': None,
-                        'arguments': ''
-                    }
-
-                if tool_call.function:
-                    if tool_call.function.name:
-                        tool_calls_accumulator[index]['name'] = tool_call.function.name
-                    if tool_call.function.arguments:
-                        tool_calls_accumulator[index]['arguments'] += tool_call.function.arguments
-
-        # Print content
-        if delta.content:
-            print(delta.content, end="", flush=True)
-
-# Print accumulated tool calls
-for index, tool_call in sorted(tool_calls_accumulator.items()):
-    print(f"🔧 Tool Call: {tool_call['name']}")
-    print(f"   Arguments: {tool_call['arguments']}")
-
-print()
-```
-
-**Output Example:**
-
-```
-=============== Thinking =================
-
-Okay, the user is asking for the weather in Beijing. Let me check the tools available. There's a function called get_weather that takes location and unit parameters. The location is required, so I need to specify Beijing as the location. The unit is optional and can be either celsius or fahrenheit. Since the user didn't specify the unit, maybe I should default to a common one. In China, they usually use celsius, so I'll set unit to celsius. I'll call the get_weather function with location: Beijing and unit: celsius. That should get the current weather for them.
-
-
-
-=============== Content =================
-
-🔧 Tool Call: get_weather
-   Arguments: {"location": "Beijing", "unit": "celsius"}
-```
-
-**Note:**
-
-- The reasoning parser shows how the model decides to use a tool
-- Tool calls are clearly marked with the function name and arguments
-- You can then execute the function and send the result back to continue the conversation
-
-**Handling Tool Call Results:**
-
-```python
-# After getting the tool call, execute the function
-def get_weather(location, unit="celsius"):
-    # Your actual weather API call here
-    return f"The weather in {location} is 22°{unit[0].upper()} and sunny."
-
-# Send tool result back to the model
 messages = [
-    {"role": "user", "content": "What's the weather in Beijing?"},
-    {
-        "role": "assistant",
-        "content": None,
-        "tool_calls": [{
-            "id": "call_123",
-            "type": "function",
-            "function": {
-                "name": "get_weather",
-                "arguments": '{"location": "Beijing", "unit": "celsius"}'
-            }
-        }]
-    },
-    {
-        "role": "tool",
-        "tool_call_id": "call_123",
-        "content": get_weather("Beijing", "celsius")
-    }
+    {"role": "system", "content": "你是一个有帮助的AI助手。"},
+    {"role": "user", "content": "请解释什么是大型语言模型。"}
 ]
 
-final_response = client.chat.completions.create(
-    model="Qwen/Qwen3-235B-A22B-Thinking-2507",
+response = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B-Instruct",
     messages=messages,
+    max_tokens=2048,
     temperature=0.7
 )
 
-print(final_response.choices[0].message.content)
-# Output: "The current weather in Beijing is **22°C** and **sunny**. A perfect day to enjoy outdoor activities! 🌞"
+print(response.choices[0].message.content)
 ```
 
-## 5. Benchmark
+## 5. 性能基准测试
 
-### 5.1 Speed Benchmark
+### 5.1 速度基准测试
 
-**Test Environment:**
+**测试环境：**
 
-- Hardware: NVIDIA B200 GPU (8x)
-- Model: Qwen3-235B-A22B-Instruct-2507
-- Tensor Parallelism: 8
-- sglang version: 0.5.6
+- 硬件：AMD MI300X GPU (8x)
+- 模型：Qwen3 系列
+- 张量并行度：8
+- sglang 版本：0.5.7
 
-We use SGLang's built-in benchmarking tool to conduct performance evaluation on the [ShareGPT_Vicuna_unfiltered](https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered) dataset. This dataset contains real conversation data and can better reflect performance in actual use scenarios.
+我们使用 SGLang 内置的基准测试工具进行性能评估。
 
-#### 5.1.1 Standard Scenario Benchmark
+#### 5.1.1 延迟敏感型基准测试
 
-- Model Deployment Command:
+- 模型部署命令：
 
 ```shell
 python -m sglang.launch_server \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --tp 8
+  --model Qwen/Qwen3-30B-A3B-Instruct \
+  --tp 8 \
+  --host 0.0.0.0 \
+  --port 30000
 ```
 
-##### 5.1.1.1 Low Concurrency
-
-- Benchmark Command:
+- 基准测试命令：
 
 ```shell
 python3 -m sglang.bench_serving \
   --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
+  --model Qwen/Qwen3-30B-A3B-Instruct \
   --dataset-name random \
   --random-input-len 1000 \
   --random-output-len 1000 \
@@ -361,523 +119,14 @@ python3 -m sglang.bench_serving \
   --max-concurrency 1
 ```
 
-- Test Results:
+### 5.2 准确性基准测试
 
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 1
-Successful requests:                     10
-Benchmark duration (s):                  43.56
-Total input tokens:                      6101
-Total input text tokens:                 6101
-Total input vision tokens:               0
-Total generated tokens:                  4210
-Total generated tokens (retokenized):    4206
-Request throughput (req/s):              0.23
-Input token throughput (tok/s):          140.07
-Output token throughput (tok/s):         96.65
-Peak output token throughput (tok/s):    100.00
-Peak concurrent requests:                2
-Total token throughput (tok/s):          236.72
-Concurrency:                             1.00
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   4353.63
-Median E2E Latency (ms):                 3475.79
----------------Time to First Token----------------
-Mean TTFT (ms):                          99.03
-Median TTFT (ms):                        92.18
-P99 TTFT (ms):                           166.05
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          10.12
-Median TPOT (ms):                        10.12
-P99 TPOT (ms):                           10.15
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           10.13
-Median ITL (ms):                         10.12
-P95 ITL (ms):                            10.49
-P99 ITL (ms):                            10.70
-Max ITL (ms):                            13.45
-==================================================
-```
+#### 5.2.1 GSM8K 基准测试
 
-##### 5.1.1.2 Medium Concurrency
-
-- Benchmark Command:
-
-```shell
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 1000 \
-  --random-output-len 1000 \
-  --num-prompts 80 \
-  --max-concurrency 16
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 16
-Successful requests:                     80
-Benchmark duration (s):                  48.95
-Total input tokens:                      39668
-Total input text tokens:                 39668
-Total input vision tokens:               0
-Total generated tokens:                  40725
-Total generated tokens (retokenized):    40716
-Request throughput (req/s):              1.63
-Input token throughput (tok/s):          810.44
-Output token throughput (tok/s):         832.04
-Peak output token throughput (tok/s):    1151.00
-Peak concurrent requests:                21
-Total token throughput (tok/s):          1642.48
-Concurrency:                             13.61
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   8326.72
-Median E2E Latency (ms):                 8827.86
----------------Time to First Token----------------
-Mean TTFT (ms):                          215.70
-Median TTFT (ms):                        88.82
-P99 TTFT (ms):                           727.08
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          16.36
-Median TPOT (ms):                        16.12
-P99 TPOT (ms):                           24.09
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           15.96
-Median ITL (ms):                         14.52
-P95 ITL (ms):                            16.04
-P99 ITL (ms):                            67.69
-Max ITL (ms):                            457.52
-==================================================
-```
-
-##### 5.1.1.3 High Concurrency
-
-- Benchmark Command:
-
-```shell
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 1000 \
-  --random-output-len 1000 \
-  --num-prompts 500 \
-  --max-concurrency 100
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 100
-Successful requests:                     500
-Benchmark duration (s):                  92.07
-Total input tokens:                      249831
-Total input text tokens:                 249831
-Total input vision tokens:               0
-Total generated tokens:                  252162
-Total generated tokens (retokenized):    251124
-Request throughput (req/s):              5.43
-Input token throughput (tok/s):          2713.46
-Output token throughput (tok/s):         2738.78
-Peak output token throughput (tok/s):    4400.00
-Peak concurrent requests:                110
-Total token throughput (tok/s):          5452.24
-Concurrency:                             90.50
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   16665.09
-Median E2E Latency (ms):                 16060.10
----------------Time to First Token----------------
-Mean TTFT (ms):                          260.55
-Median TTFT (ms):                        122.68
-P99 TTFT (ms):                           863.11
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          32.94
-Median TPOT (ms):                        34.04
-P99 TPOT (ms):                           41.19
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           32.59
-Median ITL (ms):                         23.54
-P95 ITL (ms):                            69.79
-P99 ITL (ms):                            119.09
-Max ITL (ms):                            577.70
-==================================================
-```
-
-#### 5.1.2 Reasoning Scenario Benchmark
-
-- Model Deployment Command:
-
-```shell
-python -m sglang.launch_server \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --tp 8
-```
-
-##### 5.1.2.1 Low Concurrency
-
-- Benchmark Command:
-
-```
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 1000 \
-  --random-output-len 8000 \
-  --num-prompts 10 \
-  --max-concurrency 1
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 1
-Successful requests:                     10
-Benchmark duration (s):                  457.45
-Total input tokens:                      6101
-Total input text tokens:                 6101
-Total input vision tokens:               0
-Total generated tokens:                  44452
-Total generated tokens (retokenized):    44059
-Request throughput (req/s):              0.02
-Input token throughput (tok/s):          13.34
-Output token throughput (tok/s):         97.17
-Peak output token throughput (tok/s):    100.00
-Peak concurrent requests:                2
-Total token throughput (tok/s):          110.51
-Concurrency:                             1.00
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   45742.42
-Median E2E Latency (ms):                 49266.87
----------------Time to First Token----------------
-Mean TTFT (ms):                          110.60
-Median TTFT (ms):                        109.36
-P99 TTFT (ms):                           167.43
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          10.23
-Median TPOT (ms):                        10.24
-P99 TPOT (ms):                           10.32
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           10.27
-Median ITL (ms):                         10.26
-P95 ITL (ms):                            10.71
-P99 ITL (ms):                            10.97
-Max ITL (ms):                            15.79
-==================================================
-```
-
-##### 5.1.2.2 Medium Concurrency
-
-- Benchmark Command:
-
-```
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 1000 \
-  --random-output-len 8000 \
-  --num-prompts 80 \
-  --max-concurrency 16
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 16
-Successful requests:                     80
-Benchmark duration (s):                  340.17
-Total input tokens:                      39668
-Total input text tokens:                 39668
-Total input vision tokens:               0
-Total generated tokens:                  318226
-Total generated tokens (retokenized):    318104
-Request throughput (req/s):              0.24
-Input token throughput (tok/s):          116.61
-Output token throughput (tok/s):         935.49
-Peak output token throughput (tok/s):    1120.00
-Peak concurrent requests:                19
-Total token throughput (tok/s):          1052.10
-Concurrency:                             13.85
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   58885.30
-Median E2E Latency (ms):                 59238.70
----------------Time to First Token----------------
-Mean TTFT (ms):                          169.71
-Median TTFT (ms):                        101.61
-P99 TTFT (ms):                           455.71
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          14.82
-Median TPOT (ms):                        14.91
-P99 TPOT (ms):                           15.20
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           14.76
-Median ITL (ms):                         14.63
-P95 ITL (ms):                            15.46
-P99 ITL (ms):                            16.62
-Max ITL (ms):                            104.94
-==================================================
-```
-
-##### 5.1.2.3 High Concurrency
-
-- Benchmark Command:
-
-```
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 1000 \
-  --random-output-len 8000 \
-  --num-prompts 320 \
-  --max-concurrency 64
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 64
-Successful requests:                     320
-Benchmark duration (s):                  544.83
-Total input tokens:                      158939
-Total input text tokens:                 158939
-Total input vision tokens:               0
-Total generated tokens:                  1300705
-Total generated tokens (retokenized):    1293015
-Request throughput (req/s):              0.59
-Input token throughput (tok/s):          291.72
-Output token throughput (tok/s):         2387.34
-Peak output token throughput (tok/s):    3008.00
-Peak concurrent requests:                68
-Total token throughput (tok/s):          2679.06
-Concurrency:                             56.35
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   95937.70
-Median E2E Latency (ms):                 99362.32
----------------Time to First Token----------------
-Mean TTFT (ms):                          265.03
-Median TTFT (ms):                        129.11
-P99 TTFT (ms):                           823.85
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          23.66
-Median TPOT (ms):                        24.07
-P99 TPOT (ms):                           24.97
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           23.54
-Median ITL (ms):                         23.07
-P95 ITL (ms):                            25.92
-P99 ITL (ms):                            63.87
-Max ITL (ms):                            408.30
-==================================================
-```
-
-#### 5.1.3 Summarization Scenario Benchmark
-
-##### 5.1.3.1 Low Concurrency
-
-- Benchmark Command:
-
-```
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 8000 \
-  --random-output-len 1000 \
-  --num-prompts 10 \
-  --max-concurrency 1
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 1
-Successful requests:                     10
-Benchmark duration (s):                  44.82
-Total input tokens:                      41941
-Total input text tokens:                 41941
-Total input vision tokens:               0
-Total generated tokens:                  4210
-Total generated tokens (retokenized):    4210
-Request throughput (req/s):              0.22
-Input token throughput (tok/s):          935.86
-Output token throughput (tok/s):         93.94
-Peak output token throughput (tok/s):    99.00
-Peak concurrent requests:                2
-Total token throughput (tok/s):          1029.80
-Concurrency:                             1.00
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   4479.60
-Median E2E Latency (ms):                 3622.99
----------------Time to First Token----------------
-Mean TTFT (ms):                          139.90
-Median TTFT (ms):                        114.85
-P99 TTFT (ms):                           225.17
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          10.31
-Median TPOT (ms):                        10.33
-P99 TPOT (ms):                           10.51
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           10.33
-Median ITL (ms):                         10.33
-P95 ITL (ms):                            10.73
-P99 ITL (ms):                            10.93
-Max ITL (ms):                            14.48
-==================================================
-```
-
-##### 5.1.3.2 Medium Concurrency
-
-- Benchmark Command:
-
-```
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 8000 \
-  --random-output-len 1000 \
-  --num-prompts 80 \
-  --max-concurrency 16
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 16
-Successful requests:                     80
-Benchmark duration (s):                  50.68
-Total input tokens:                      300020
-Total input text tokens:                 300020
-Total input vision tokens:               0
-Total generated tokens:                  41589
-Total generated tokens (retokenized):    41578
-Request throughput (req/s):              1.58
-Input token throughput (tok/s):          5920.41
-Output token throughput (tok/s):         820.69
-Peak output token throughput (tok/s):    1200.00
-Peak concurrent requests:                20
-Total token throughput (tok/s):          6741.10
-Concurrency:                             13.90
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   8805.54
-Median E2E Latency (ms):                 9368.79
----------------Time to First Token----------------
-Mean TTFT (ms):                          284.29
-Median TTFT (ms):                        168.48
-P99 TTFT (ms):                           1027.21
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          16.81
-Median TPOT (ms):                        16.66
-P99 TPOT (ms):                           27.18
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           16.42
-Median ITL (ms):                         13.68
-P95 ITL (ms):                            17.23
-P99 ITL (ms):                            90.75
-Max ITL (ms):                            574.64
-==================================================
-```
-
-##### 5.1.3.3 High Concurrency
-
-- Benchmark Command:
-
-```
-python3 -m sglang.bench_serving \
-  --backend sglang \
-  --model Qwen/Qwen3-235B-A22B-Instruct-2507 \
-  --dataset-name random \
-  --random-input-len 8000 \
-  --random-output-len 1000 \
-  --num-prompts 320 \
-  --max-concurrency 64
-```
-
-- Test Results:
-
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang
-Traffic request rate:                    inf
-Max request concurrency:                 64
-Successful requests:                     320
-Benchmark duration (s):                  94.77
-Total input tokens:                      1273893
-Total input text tokens:                 1273893
-Total input vision tokens:               0
-Total generated tokens:                  169680
-Total generated tokens (retokenized):    169640
-Request throughput (req/s):              3.38
-Input token throughput (tok/s):          13441.86
-Output token throughput (tok/s):         1790.43
-Peak output token throughput (tok/s):    2687.00
-Peak concurrent requests:                70
-Total token throughput (tok/s):          15232.28
-Concurrency:                             58.63
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   17364.14
-Median E2E Latency (ms):                 17495.95
----------------Time to First Token----------------
-Mean TTFT (ms):                          238.22
-Median TTFT (ms):                        203.27
-P99 TTFT (ms):                           510.48
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          32.50
-Median TPOT (ms):                        34.27
-P99 TPOT (ms):                           40.59
----------------Inter-Token Latency----------------
-Mean ITL (ms):                           32.36
-Median ITL (ms):                         22.50
-P95 ITL (ms):                            97.81
-P99 ITL (ms):                            151.55
-Max ITL (ms):                            352.79
-==================================================
-```
-
-### 5.2 Accuracy Benchmark
-
-#### 5.2.1 GSM8K Benchmark
-
-- **Benchmark Command:**
+- **基准测试命令：**
 
 ```shell
 python3 -m sglang.test.few_shot_gsm8k --num-questions 200
 ```
 
-- **Results**:
-
-  - Qwen/Qwen3-235B-A22B-Instruct-2507
-    ```
-    Accuracy: 0.945
-    Invalid: 0.000
-    Latency: 11.980 s
-    Output throughput: 2358.105 token/s
-    ```
+有关完整的基准测试结果和详细配置，请参阅官方文档。
